@@ -8,13 +8,164 @@ servers:
   - url: /
 
 paths:
-  /blacklist:
+  #/blacklist:
     # ................................
   /block:
-    # ................................
+    post:
+      summary: Blocking a user 
+      tags:
+        - Blacklist
+      operationId: mib.resources.blacklist.block
+      requestBody:
+        description: Adding a user to blacklist, blocking the user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockUser'
+      responses:
+        201:
+          description: User correctly blocked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "It can be failure or success"
+                    default: 'success'
+                  message:
+                    type: string
+                    description: "It can be failure or success"
+                    default: 'Successfully added to blacklist'
+                  blacklist:
+                    type: string
+                    description: "Blacklist row"
+                    default: "{...}"
+        500:
+          description: Failure in adding the user to blacklist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "It can be failure or success"
+                    default: 'failure'
+                  message:
+                    type: string
+                    description: "It can be failure or User not found"
+                    default: 'User not added to blacklist'
+          
+        default:
+          description: Error blocking the user
+
   /unblock:
-    # ................................
+    delete:
+      summary: Unblocking a user 
+      tags:
+        - Blacklist
+      operationId: mib.resources.blacklist.unblock
+      requestBody:
+        description: Remove a user from blacklist, unblocking the user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockUser'
+      responses:
+        202:
+          description: User correctly unblocked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "It can be failure or success"
+                    default: 'success'
+                  message:
+                    type: string
+                    description: "It can be failure or success"
+                    default: 'Successfully removed from blacklist'
+                  blacklist:
+                    type: string
+                    description: "Blacklist row"
+                    default: "{...}"
+        404:
+          description: Not found blacklist instace
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "It can be failure or success"
+                    default: 'failure'
+                  message:
+                    type: string
+                    description: "It can be failure or User not found"
+                    default: 'User not in blacklist'
+        500:
+          description: Failure in removing the user from blacklist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "It can be failure or success"
+                    default: 'failure'
+                  message:
+                    type: string
+                    description: "It can be failure or User not found"
+                    default: 'User not removed from blacklist'
+          
+        default:
+          description: Error unblocking the user
+  
+  /blacklist/{user_id}:
+      get:
+        tags: [ Blacklist ]
+        description: Get a user by its id
+        operationId: mib.resources.blacklist.get_blacklist #_user_details
+        parameters:
+          - name: user_id
+            description: User Unique ID
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+        responses:
+          200:
+            description: Return blacklist list
+          500:
+            description: Internal error while retrieving
+          default:
+            description: An error occured while retrieving the blacklist
 
 components:
   schemas:
+    BlockUser:
+      required:
+        - blocking_user_id
+        - blocked_user_id
+      type: object
+      properties:
+        blocking_user_id:
+          type: integer
+          format: int64
+          description: The id of blocking user
+          example: 1
+        blocked_user_id:
+          type: integer
+          format: int64
+          description: The id of blocked user
+          example: 2
     # ................................

@@ -2,14 +2,18 @@ from mib import db
 
 # TODO look at mib-users/mib/models/user.py
 
+
 class Blacklist(db.Model):
     """Representation of Blacklist model."""
     # The name of the table that we explicitly set
 
     __tablename__ = 'blacklist'
-
+    SERIALIZE_LIST = ['blocking_user_id', 'blocked_user_id']
     blocking_user_id = db.Column(db.Integer, nullable=False)
     blocked_user_id = db.Column(db.Integer, nullable=False)
+
+   
+
 
     __table_args__ = (
         db.PrimaryKeyConstraint(

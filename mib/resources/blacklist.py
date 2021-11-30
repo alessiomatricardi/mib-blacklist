@@ -4,21 +4,52 @@ from mib.dao.blacklist_manager import BlacklistManager
 from mib.models.blacklist import Blacklist
 import datetime
 import json
+import requests
+from mib import app
+
+USERS_ENDPOINT = app.config['USERS_MS_URL']
+REQUESTS_TIMEOUT_SECONDS = app.config['REQUESTS_TIMEOUT_SECONDS']
 
 #TODO handle errors
 def block():
     post_data = request.get_json()
-    blocking_user = post_data.get('blocking_user_id')
-    blocked_user = post_data.get('blocked_user_id')
+    blocking_user_id = post_data.get('blocking_user_id')
+    blocked_user_id = post_data.get('blocked_user_id')
+
+    # check if the users exist
+    try:
+        blocking_user_response = requests.get("%s/users/%s/list/%s" % (USERS_ENDPOINT, str(blocking_user_id), str(blocking_user_id)),
+                                timeout=REQUESTS_TIMEOUT_SECONDS)
+
+        blocked_user_response = requests.get("%s/users/%s/list/%s" % (USERS_ENDPOINT, str(blocking_user_id), str(blocked_user_id)),
+                                timeout=REQUESTS_TIMEOUT_SECONDS)
+        
+        if blocking_user_response.status_code != 200:
+            response_object = {
+                'status': 'failure',
+                'message': 'Error in retrieving blocking user',
+            }
+            return blocking_user_response.json(), blocking_user_response.status_code
+
+        if blocked_user_response.status_code != 200:
+            response_object = {
+                'status': 'failure',
+                'message': 'Error in retrieving blocked user',
+            }
+            return blocked_user_response.json(), blocked_user_response.status_code 
+            
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        response_object = {
+            'status': 'failure',
+            'message': 'Error in retrieving user',
+        }
+        return jsonify(response_object), 500
 
     blacklist = Blacklist()
-    blacklist.set_blocking_user_id(blocking_user)
-    blacklist.set_blocked_user_id(blocked_user)
+    blacklist.set_blocking_user_id(blocking_user_id)
+    blacklist.set_blocked_user_id(blocked_user_id)
 
-    #TODO check if blocked_user_id exists
-    # response = requests.get("%s/users/%s" % (cls.USERS_ENDPOINT, str(blocking_user)),
-    #                                 timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-
+    
     try:
         BlacklistManager.block(blacklist)
     except Exception:

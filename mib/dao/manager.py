@@ -20,18 +20,18 @@ class Manager(object):
 
         db.session.commit()
 
-    @staticmethod
-    def retrieve():
-        """
-        It should implemented by child
-        :return:
-        """
-        pass
+    # @staticmethod
+    # def retrieve():
+    #     """
+    #     It should implemented by child
+    #     :return:
+    #     """
+    #     pass
 
-    @staticmethod
-    def update(**kwargs):
-        Manager.check_none(**kwargs)
-        db.session.commit()
+    # @staticmethod
+    # def update(**kwargs):
+    #     Manager.check_none(**kwargs)
+    #     db.session.commit()
 
     @staticmethod
     def delete(**kwargs):

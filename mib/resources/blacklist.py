@@ -53,10 +53,7 @@ def block():
     try:
         BlacklistManager.block(blacklist)
     except Exception:
-        response_object =  {
-        'status': 'failure',
-        'message': 'User not added to blacklist',
-        }
+        response_object =  {'status': 'failure','message': 'User not added to blacklist',}
         return jsonify(response_object), 500
     
     response_object = {

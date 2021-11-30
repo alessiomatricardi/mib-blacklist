@@ -8,8 +8,6 @@ servers:
   - url: /
 
 paths:
-  #/blacklist:
-    # ................................
   /block:
     post:
       summary: Blocking a user 

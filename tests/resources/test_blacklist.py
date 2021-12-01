@@ -1,8 +1,6 @@
 import unittest
 from mib import create_app
 import responses
-import json
-import requests
 
 
 
@@ -15,7 +13,6 @@ class ResourcesTest(unittest.TestCase):
         tested_app = create_app()
         
         USERS_ENDPOINT = tested_app.config['USERS_MS_URL']
-        REQUESTS_TIMEOUT_SECONDS = tested_app.config['REQUESTS_TIMEOUT_SECONDS']
         
         app = tested_app.test_client()
 
@@ -26,33 +23,30 @@ class ResourcesTest(unittest.TestCase):
 
         json_data_failure = {
                         'blocked_user_id': int(unavailable_blocked_user),
-                        'blocking_user_id': int(unexisting_blocking_user)
+                        'requester_id': int(unexisting_blocking_user)
                         }
         json_data_failure2 = {
                         'blocked_user_id': int(unavailable_blocked_user),
-                        'blocking_user_id': int(existing_blocking_user)
+                        'requester_id': int(existing_blocking_user)
                         }
         json_data_success = {
                         'blocked_user_id': available_blocked_user,
-                        'blocking_user_id': existing_blocking_user
+                        'requester_id': existing_blocking_user
                         }
         # failure without users response not already mocked, status_code 500
         response = app.post('/block',json=json_data_success)
         self.assertEqual(response.status_code,500)
 
-        responses.add(responses.GET, "%s/users/%s/list/%s" % (USERS_ENDPOINT, str(unexisting_blocking_user), str(unexisting_blocking_user)),
+        responses.add(responses.GET, "%s/users/%s" % (USERS_ENDPOINT, str(unexisting_blocking_user)),
                   json={'status': 'Current user not present'}, status=404)
 
-        responses.add(responses.GET, "%s/users/%s/list/%s" % (USERS_ENDPOINT, str(unexisting_blocking_user), str(unavailable_blocked_user)),
-                  json={'status': 'User not present'}, status=404)
-        
-        responses.add(responses.GET, "%s/users/%s/list/%s" % (USERS_ENDPOINT, str(existing_blocking_user), str(unavailable_blocked_user)),
+        responses.add(responses.GET, "%s/users/%s" % (USERS_ENDPOINT, str(unavailable_blocked_user)),
                   json={'status': 'User not present'}, status=404)
 
-        responses.add(responses.GET, "%s/users/%s/list/%s" % (USERS_ENDPOINT, str(existing_blocking_user), str(existing_blocking_user)),
+        responses.add(responses.GET, "%s/users/%s" % (USERS_ENDPOINT, str(existing_blocking_user)),
                    status=200)
 
-        responses.add(responses.GET, "%s/users/%s/list/%s" % (USERS_ENDPOINT, str(existing_blocking_user), str(available_blocked_user)),
+        responses.add(responses.GET, "%s/users/%s" % (USERS_ENDPOINT, str(available_blocked_user)),
                    status=200)
         
 
@@ -70,8 +64,8 @@ class ResourcesTest(unittest.TestCase):
 
         # BLACKLIST retrieving
         # checking the istances on database
-        url = '/blacklist/' + str(existing_blocking_user)
-        response = app.get(url)
+        response = app.get('/blacklist', json = {'requester_id' : existing_blocking_user})
+        self.assertEqual(response.status_code,200)
         response_json = response.get_json()
         self.assertEqual(response_json['blacklist'],'[2]')
     

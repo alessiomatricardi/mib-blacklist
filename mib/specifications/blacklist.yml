@@ -10,12 +10,11 @@ servers:
 paths:
   /block:
     post:
-      summary: Blocking a user 
+      summary: Block a user 
       tags:
         - Blacklist
       operationId: mib.resources.blacklist.block
       requestBody:
-        description: Adding a user to blacklist, blocking the user
         required: true
         content:
           application/json:
@@ -32,15 +31,11 @@ paths:
                   status:
                     type: string
                     description: "It can be failure or success"
-                    default: 'success'
-                  message:
+                  description:
                     type: string
-                    description: "It can be failure or success"
-                    default: 'Successfully added to blacklist'
-                  blacklist:
-                    type: string
-                    description: "Blacklist row"
-                    default: "{...}"
+                    description: "Human readable result"
+                  blockItem:
+                    $ref : '#/components/schemas/BlockItem'
         500:
           description: Failure in adding the user to blacklist
           content:
@@ -51,11 +46,9 @@ paths:
                   status:
                     type: string
                     description: "It can be failure or success"
-                    default: 'failure'
-                  message:
+                  description:
                     type: string
-                    description: "It can be failure or User not found"
-                    default: 'User not added to blacklist'
+                    description: "Human readable result"
           
         default:
           description: Error blocking the user
@@ -67,7 +60,6 @@ paths:
         - Blacklist
       operationId: mib.resources.blacklist.unblock
       requestBody:
-        description: Remove a user from blacklist, unblocking the user
         required: true
         content:
           application/json:
@@ -84,17 +76,13 @@ paths:
                   status:
                     type: string
                     description: "It can be failure or success"
-                    default: 'success'
-                  message:
+                  description:
                     type: string
-                    description: "It can be failure or success"
-                    default: 'Successfully removed from blacklist'
-                  blacklist:
-                    type: string
-                    description: "Blacklist row"
-                    default: "{...}"
+                    description: "Human readable result"
+                  blockItem:
+                    $ref : '#/components/schemas/BlockItem'
         404:
-          description: Not found blacklist instace
+          description: Not found blacklist instance
           content:
             application/json:
               schema:
@@ -103,54 +91,80 @@ paths:
                   status:
                     type: string
                     description: "It can be failure or success"
-                    default: 'failure'
-                  message:
+                  description:
                     type: string
-                    description: "It can be failure or User not found"
-                    default: 'User not in blacklist'
-        500:
-          description: Failure in removing the user from blacklist
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    description: "It can be failure or success"
-                    default: 'failure'
-                  message:
-                    type: string
-                    description: "It can be failure or User not found"
-                    default: 'User not removed from blacklist'
+                    description: "Human readable result"
           
         default:
           description: Error unblocking the user
   
-  /blacklist/{user_id}:
+  /blacklist:
       get:
         tags: [ Blacklist ]
-        description: Get a user by its id
-        operationId: mib.resources.blacklist.get_blacklist #_user_details
-        parameters:
-          - name: user_id
-            description: User Unique ID
-            in: path
-            required: true
-            schema:
-              type: integer
-              format: int64
+        description: Get a list of blocked and blocking users
+        operationId: mib.resources.blacklist.get_blacklist
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequesterID'
         responses:
           200:
-            description: Return blacklist list
+            description: Return a list of blocked and blocking users
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      description: "It can be failure or success"
+                    description:
+                      type: string
+                      description: "Human readable result"
+                    blacklist:
+                      type: array
+                      items: 
+                        $ref : '#/components/schemas/BlockItem'
+
           500:
             description: Internal error while retrieving
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      description: "It can be failure or success"
+                    description:
+                      type: string
+                      description: "Human readable result"
+
           default:
             description: An error occured while retrieving the blacklist
 
 components:
   schemas:
     BlockUser:
+      required:
+        - requester_id
+        - blocked_user_id
+      type: object
+      properties:
+        requester_id:
+          type: integer
+          format: int64
+          description: user ID of blocking user
+          example: 1
+        blocked_user_id:
+          type: integer
+          format: int64
+          description: The id of blocked user
+          example: 2
+    
+    BlockItem:
       required:
         - blocking_user_id
         - blocked_user_id
@@ -166,4 +180,14 @@ components:
           format: int64
           description: The id of blocked user
           example: 2
-    # ................................
+
+    RequesterID:
+      required:
+        - requester_id
+      type: object
+      properties:
+        requester_id:
+          type: integer
+          format: int64
+          description: user ID
+          example: 123

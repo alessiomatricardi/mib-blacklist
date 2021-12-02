@@ -101,7 +101,7 @@ paths:
   /blacklist:
       get:
         tags: [ Blacklist ]
-        description: Get a list of blocked and blocking users
+        summary: Get a list of blocked and blocking users
         operationId: mib.resources.blacklist.get_blacklist
         requestBody:
           required: true

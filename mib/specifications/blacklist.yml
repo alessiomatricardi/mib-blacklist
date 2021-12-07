@@ -126,7 +126,7 @@ paths:
                     blacklist:
                       type: array
                       items: 
-                        $ref : '#/components/schemas/BlockItem'
+                        type: integer
 
           500:
             description: Internal error while retrieving

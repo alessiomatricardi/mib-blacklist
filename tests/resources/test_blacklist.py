@@ -67,7 +67,7 @@ class ResourcesTest(unittest.TestCase):
         response = app.get('/blacklist', json = {'requester_id' : existing_blocking_user})
         self.assertEqual(response.status_code,200)
         response_json = response.get_json()
-        self.assertEqual(response_json['blacklist'],'[2]')
+        self.assertEqual(response_json['blacklist'],[2])
     
         # UNBLOCK SUCCESS
         # removing the previously created istance from blacklist table

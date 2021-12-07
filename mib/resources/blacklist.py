@@ -28,7 +28,7 @@ def get_blacklist():
         return jsonify(response_object), 500
 
     response_object = {
-        'blacklist': json.dumps(blacklist),
+        'blacklist': blacklist,
         'status': 'success',
         'description': 'Blacklist successfully retrieved',
     }

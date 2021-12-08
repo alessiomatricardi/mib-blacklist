@@ -21,18 +21,16 @@ class BlacklistManager(Manager):
         Manager.delete(blacklist=blacklist)
         
     @staticmethod
-    def retrieve_blacklist_by_user_id(user_id) -> List[int]:
+    def retrieve_blacklist_by_user_id(user_id):
         
         Manager.check_none(user_id=user_id)
         
-        blacklist = Blacklist.query.filter(or_(
-            Blacklist.blocking_user_id == user_id,
-            Blacklist.blocked_user_id == user_id
-        )).all()
+        blocking = Blacklist.query.filter(Blacklist.blocked_user_id == user_id).all()
+        blocked = Blacklist.query.filter(Blacklist.blocking_user_id == user_id).all()
         
-        blacklist_ids = [ob.blocked_user_id if ob.blocking_user_id == user_id else ob.blocking_user_id for ob in blacklist]
-
-        return blacklist_ids
+        blocking_ids = [ob.blocking_user_id for ob in blocking]
+        blocked_ids= [ob.blocked_user_id for ob in blocked]
+        return blocking_ids,blocked_ids
 
     @staticmethod
     def retrieve_blacklist_element(blocking, blocked) -> Blacklist:

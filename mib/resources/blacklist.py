@@ -16,10 +16,11 @@ def get_blacklist():
     data = request.get_json()
     requester_id = data.get('requester_id')
 
+    blocking = []
+    blocked = []
     try:
+        blocking,blocked= BlacklistManager.retrieve_blacklist_by_user_id(requester_id)
 
-        blacklist = BlacklistManager.retrieve_blacklist_by_user_id(requester_id)
-    
     except Exception:
         response_object =  {
             'status': 'failure',
@@ -28,7 +29,8 @@ def get_blacklist():
         return jsonify(response_object), 500
 
     response_object = {
-        'blacklist': blacklist,
+        'blocking': blocking,
+        'blocked': blocked,
         'status': 'success',
         'description': 'Blacklist successfully retrieved',
     }

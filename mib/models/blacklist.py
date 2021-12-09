@@ -1,7 +1,5 @@
 from mib import db
 
-# TODO look at mib-users/mib/models/user.py
-
 
 class Blacklist(db.Model):
     """Representation of Blacklist model."""

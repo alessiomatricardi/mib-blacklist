@@ -1,4 +1,3 @@
-# TODO look at mib-users/mib/resources/users.py
 from flask import request, jsonify
 from mib.dao.blacklist_manager import BlacklistManager
 from mib.models.blacklist import Blacklist

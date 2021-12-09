@@ -29,8 +29,9 @@ class BlacklistManager(Manager):
         blocked = Blacklist.query.filter(Blacklist.blocking_user_id == user_id).all()
         
         blocking_ids = [ob.blocking_user_id for ob in blocking]
-        blocked_ids= [ob.blocked_user_id for ob in blocked]
-        return blocking_ids,blocked_ids
+        blocked_ids = [ob.blocked_user_id for ob in blocked]
+        
+        return blocking_ids, blocked_ids
 
     @staticmethod
     def retrieve_blacklist_element(blocking, blocked) -> Blacklist:
